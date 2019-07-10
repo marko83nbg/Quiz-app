@@ -2,9 +2,10 @@ let questionContainer = document.getElementById('quizQuestion');
 let btn = document.getElementById('btn');
 let finish = document.getElementById('finish');
 let continentArray = ['Africa', 'Asia', 'South America', 'North America', 'Europe', 'Oceania', 'Antarctica'];
-let counter = 0;
+let scoreCounter = 0;
+let questionCounter = 1;
 
-//na klik dohvata JSON parsira ga i pokrece f-ju za ispisivanje
+//na klik dohvata JSON parsira ga i pokrece f-ju za ispisivanje - on click parses JSON
 btn.addEventListener('click', function () {
     const myRequest = new XMLHttpRequest();
 
@@ -18,76 +19,118 @@ btn.addEventListener('click', function () {
     myRequest.send();
 });
 
-//f-ja za ispisivanje
+//f-ja za ispisivanje - function for displaying questions
 function displayQuestion(data) {
-    let htmlString = '';
 
-    let randomObject = data[Math.floor(Math.random() * data.length)];
-    console.log(randomObject);
-    let shuffledContinetArray = shuffle(continentArray);
-    console.log(shuffledContinetArray);
-    let newContinetArray = [];
-    if (shuffledContinetArray[0] === randomObject.continent) {
-        
-        newContinetArray.splice(0, 0, `<button type = "button" class = "incorrect">${shuffledContinetArray[1]} <i class="fas fa-times "></i></button>`, 
-                                      `<button type = "button" class = "incorrect">${shuffledContinetArray[2]} <i class="fas fa-times "></i></button>`, 
-                                      `<button type = "button" class = "correct">${randomObject.continent} <i class="fas fa-check "></i></button>`);
-        let shuffledNewContinentArray = shuffle(newContinetArray);
-        
-        htmlString = `<img src = "${randomObject.image}"> 
+    if (questionCounter <= 5) {
+        btn.innerText = `NEXT`
+        let htmlString = '';
+
+        let randomObject = data[Math.floor(Math.random() * data.length)];
+        let shuffledContinetArray = shuffle(continentArray);
+        let newContinetArray = [];
+        if (shuffledContinetArray[0] === randomObject.continent) {
+
+            newContinetArray.splice(0, 0, `<button type = "button" class = "incorrect">${shuffledContinetArray[1]} <i class="fas fa-times "></i></button>`,
+                `<button type = "button" class = "incorrect1">${shuffledContinetArray[2]} <i class="fas fa-times "></i></button>`,
+                `<button type = "button" class = "correct">${randomObject.continent} <i class="fas fa-check "></i></button>`);
+            let shuffledNewContinentArray = shuffle(newContinetArray);
+
+            htmlString = `<h2> Question ${questionCounter} of 5 </h2>
+                     <img src = "${randomObject.image}"> 
                      ${shuffledNewContinentArray[0]} 
                      ${shuffledNewContinentArray[1]}
                      ${shuffledNewContinentArray[2]}
                      <input type = "text" id = "score" value = "">`
-        questionContainer.innerHTML = htmlString;
-    
-    } else if (shuffledContinetArray[1] === randomObject.continent) {
-        
-        newContinetArray.splice(0, 0, `<button type = "button" class = "incorrect">${shuffledContinetArray[0]} <i class="fas fa-times "></i></button>`, 
-                                      `<button type = "button" class = "incorrect">${shuffledContinetArray[2]} <i class="fas fa-times "></i></button>`, 
-                                      `<button type = "button" class = "correct">${randomObject.continent} <i class="fas fa-check "></i></button>`);
-        
-        let shuffledNewContinentArray = shuffle(newContinetArray);
-        
-        htmlString = `<img src = "${randomObject.image}"> 
+            questionContainer.innerHTML = htmlString;
+
+        } else if (shuffledContinetArray[1] === randomObject.continent) {
+
+            newContinetArray.splice(0, 0, `<button type = "button" class = "incorrect">${shuffledContinetArray[0]} <i class="fas fa-times "></i></button>`,
+                `<button type = "button" class = "incorrect1">${shuffledContinetArray[2]} <i class="fas fa-times "></i></button>`,
+                `<button type = "button" class = "correct">${randomObject.continent} <i class="fas fa-check "></i></button>`);
+
+            let shuffledNewContinentArray = shuffle(newContinetArray);
+
+            htmlString = `<h2> Question ${questionCounter} of 5 </h2>
+                     <img src = "${randomObject.image}"> 
                      ${shuffledNewContinentArray[0]} 
                      ${shuffledNewContinentArray[1]}
                      ${shuffledNewContinentArray[2]}
                      <input type = "text" id = "score" value = "">`
-        questionContainer.innerHTML = htmlString;
-    
+            questionContainer.innerHTML = htmlString;
+
+        } else {
+
+            newContinetArray.splice(0, 0, `<button type = "button" class = "incorrect">${shuffledContinetArray[0]} <i class="fas fa-times "></i></button>`,
+                `<button type = "button" class = "incorrect1">${shuffledContinetArray[1]} <i class="fas fa-times "></i></button>`,
+                `<button type = "button" class = "correct">${randomObject.continent} <i class="fas fa-check "></i></button>`);
+
+            let shuffledNewContinentArray = shuffle(newContinetArray);
+
+            htmlString = `<h2> Question ${questionCounter} of 5 </h2>
+                     <img src = "${randomObject.image}"> 
+                     ${shuffledNewContinentArray[0]} 
+                     ${shuffledNewContinentArray[1]}
+                     ${shuffledNewContinentArray[2]}
+                     <input type = "text" id = "score" value = "">`
+            questionContainer.innerHTML = htmlString;
+        }
+
+        let correctAnswer = document.querySelector('.correct');
+        let incorrectAnswer = document.querySelector('.incorrect');
+        let incorrectAnswer1 = document.querySelector('.incorrect1');
+        
+        correctAnswer.addEventListener('click', function () {
+            addScore(correctAnswer);
+            document.querySelector('.fa-check').style = ' visibility: visible;';
+            incorrectAnswer.disabled = true;
+            incorrectAnswer1.disabled = true;
+            correctAnswer.disabled = true;
+            correctAnswer.style = 'background: rgb(255, 187, 0);'
+        });
+
+        incorrectAnswer.addEventListener('click', function () {
+            document.querySelector('.incorrect .fa-times').style = ' visibility: visible;';
+            incorrectAnswer1.disabled = true;
+            incorrectAnswer.disabled = true;
+            correctAnswer.disabled = true;
+            incorrectAnswer.style = 'background: rgb(255, 187, 0);'
+            document.querySelector('.fa-check').style = ' visibility: visible;';
+        });
+
+        incorrectAnswer1.addEventListener('click', function () {
+            document.querySelector('.incorrect1 .fa-times').style = ' visibility: visible;';
+            incorrectAnswer1.disabled = true;
+            incorrectAnswer.disabled = true;
+            correctAnswer.disabled = true;
+            incorrectAnswer1.style = 'background: rgb(255, 187, 0);'
+            document.querySelector('.fa-check').style = ' visibility: visible;';
+        });
+
+        document.getElementById('score').value = scoreCounter;
+        
+        questionCounter++;
     } else {
-        
-        newContinetArray.splice(0, 0, `<button type = "button" class = "incorrect">${shuffledContinetArray[0]} <i class="fas fa-times "></i></button>`, 
-                                      `<button type = "button" class = "incorrect">${shuffledContinetArray[1]} <i class="fas fa-times "></i></button>`, 
-                                      `<button type = "button" class = "correct">${randomObject.continent} <i class="fas fa-check "></i></button>`);
-        
-        let shuffledNewContinentArray = shuffle(newContinetArray);
-        
-        htmlString = `<img src = "${randomObject.image}"> 
-                     ${shuffledNewContinentArray[0]} 
-                     ${shuffledNewContinentArray[1]}
-                     ${shuffledNewContinentArray[2]}
-                     <input type = "text" id = "score" value = "">`
-        questionContainer.innerHTML = htmlString;
+        finish.style = 'display: inline';
+        btn.style = 'display:none'
+        questionContainer.innerHTML = `<h2> Your score is ${scoreCounter} pts </h2>`;
+        // na klik dodaje finalni rezultat u local storage - on click adds final result to local storage
+        finish.addEventListener('click', function () {
+            let finalScore = scoreCounter;
+            saveScore(finalScore);
+            showScore();
+            scoreCounter = 0;
+            btn.style = 'display:inline';
+            finish.style = 'display: none';
+            questionCounter = 1;
+            btn.innerText = `Play`;
+        })
     }
-
-    let correctAnswer = document.querySelector('.correct');
-    let incorrectAnswer = document.querySelector('.incorrect');
-
-    correctAnswer.addEventListener('click', function () {
-        addScore(correctAnswer);
-        document.querySelector('.fa-check').style = ' visibility: visible;';
-    });
-
-    incorrectAnswer.addEventListener('click', function () {
-        document.querySelector('.fa-times').style = ' visibility: visible;';
-    });
-
-    document.getElementById('score').value = counter;
 }
 
-// f-ja za nasumicno redjanje elemenata niza
+
+// f-ja za nasumicno redjanje elemenata niza - function for shuffle array
 function shuffle(arra1) {
     var ctr = arra1.length, temp, index;
 
@@ -101,24 +144,16 @@ function shuffle(arra1) {
     return arra1;
 }
 
-//f-ja za dodavanje rezultata
+//f-ja za dodavanje rezultata - function for adding score
 function addScore(x) {
     
     if (x.className === 'correct') {
-        counter += 750;
+        scoreCounter += 750;
     }
-    document.getElementById('score').value = counter;
+    document.getElementById('score').value = scoreCounter;
 }
 
-// na klik dodaje finalni rezultat u local storage
-finish.addEventListener('click', function() {
-    let finalScore = document.getElementById('score').value;
-    saveScore(finalScore);
-    showScore();
-    counter = 0;
-})
-
-// f-ja za dodavanje rezultata u local storage
+// f-ja za dodavanje rezultata u local storage - function for adding final score to local storage
 function saveScore(y) {
     let scoreList = [];
     const newScore = y;
@@ -134,17 +169,33 @@ function saveScore(y) {
     }
 }
 
-// f-ja za prikazivanje rezultata
+// f-ja za prikazivanje rezultata - function for displaying results
 function showScore() {
     const scoreList = JSON.parse(localStorage.getItem('listOfScores'));
     if (scoreList) {
         const sortedList = scoreList.sort((a, b) => b - a);
-        let scoreTableHtml = `<table><tr><td><span>#1</span></i>${sortedList[0]}</td></tr>
-                                 <tr><td><span>#2</span></i>${sortedList[1]}</td></tr>
-                                 <tr><td><span>#3</span></i>${sortedList[2]}</td></tr>`;
-        document.getElementById('quizQuestion').innerHTML = scoreTableHtml;
+        if (sortedList[1] === undefined) {
+            let scoreTableHtml = `<h1>Youre Score</h1>
+                              <table><tr><td><span>#1</span></i>${sortedList[0]} pts</td></tr>
+                              <tr><td><span>#2</span></i>No pts</td></tr>
+                              <tr><td><span>#3</span></i>No pts</td></tr>`;
+            document.getElementById('quizQuestion').innerHTML = scoreTableHtml;
+        } else if (sortedList[2] === undefined) {
+            let scoreTableHtml = `<h1>Youre Score</h1>
+                              <table><tr><td><span>#1</span></i>${sortedList[0]} pts</td></tr>
+                              <tr><td><span>#2</span></i>${sortedList[1]} pts</td></tr>
+                              <tr><td><span>#3</span></i>No pts</td></tr>`;
+            document.getElementById('quizQuestion').innerHTML = scoreTableHtml;
+        } else {
+            let scoreTableHtml = `<h1>Youre Score</h1>
+                                <table><tr><td><span>#1</span></i>${sortedList[0]} pts</td></tr>
+                                <tr><td><span>#2</span></i>${sortedList[1]} pts</td></tr>
+                                <tr><td><span>#3</span></i>${sortedList[2]} pts</td></tr>`;
+            document.getElementById('quizQuestion').innerHTML = scoreTableHtml;
+        }
+
     } else {
-        document.getElementById('quizQuestion').innerHTML = `<p>You don't have any score!</p>`;
+        document.getElementById('quizQuestion').innerHTML = `<h1>You don't have any score!</h1>`;
     }
 }
 
